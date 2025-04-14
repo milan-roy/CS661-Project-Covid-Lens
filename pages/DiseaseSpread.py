@@ -26,8 +26,142 @@ def load_choropleth_df(spread_df):
 
 ################## Overview ###################################
 @st.fragment
+def continets_charts(final_values_df):
+    st.subheader("COVID-19 Impact by Continent")
+    continents = ['Asia','Europe','North America', 'South America', 'Africa', 'Oceania']
+    continets_df = final_values_df[final_values_df['Country'].isin(continents)].reset_index(drop=True)
+
+    if 'graph_type_continents' not in st.session_state:
+        st.session_state.graph_type_continents = 'Pie Chart'
+
+    if 'rel2pop_continents' not in st.session_state:
+        st.session_state.rel2pop_continents = False
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.radio(
+                "Select the type of graph:",
+                options=['Pie Chart', 'Bar Graph'],
+                horizontal= True,
+                index=['Pie Chart', 'Bar Graph'].index(st.session_state.graph_type_continents),
+                key='graph_type_continents'
+            )
+    with col2:
+        if st.session_state.graph_type_continents == 'Bar Graph':
+            st.checkbox(
+                    'Make the graphs realtive to population.',
+                    key='rel2pop_continents',
+                )
+    
+    col1, col2 =st.columns(2)
+    with col1:
+        title = "COVID-19 Cases by Continent"
+        if st.session_state.graph_type_continents == 'Pie Chart':
+            fig = px.pie(continets_df,
+                        names = "Country",
+                        values= "Total Cases",
+                        title= title,
+                        )
+        else:
+            fig = px.bar(continets_df, 
+                        x='Country', 
+                        y='Total Cases' if not st.session_state.rel2pop_continents else 'Total Cases Per Million', 
+                        title=title,
+                        labels={'Country': 'Continent'},
+                    )
+        st.plotly_chart(fig)
+    with col2:
+        title = "COVID-19 Deaths by Continent"
+        if st.session_state.graph_type_continents == 'Pie Chart':
+            fig = px.pie(continets_df,
+                        names = "Country",
+                        values= "Total Deaths",
+                        title= title,
+                        )
+        else:
+            fig = px.bar(continets_df, 
+                        x='Country', 
+                        y='Total Deaths' if not st.session_state.rel2pop_continents else 'Total Deaths Per Million', 
+                        title=title,
+                        labels={'Country': 'Continent'},
+                    )
+        st.plotly_chart(fig)
+
+@st.fragment
+def top_n_countries(final_values_df):
+    st.subheader("COVID-19 Top Countries")
+
+    filtered_df = final_values_df.dropna().reset_index(drop=True)
+    
+    if 'num_countries' not in st.session_state:
+        st.session_state.num_countries = 2
+
+    if 'graph_type_countries' not in st.session_state:
+        st.session_state.graph_type_countries = 'Pie Chart'
+
+    if 'rel2pop_countries' not in st.session_state:
+        st.session_state.rel2pop_countries = False
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.number_input(
+            "Choose the number of countries",
+             min_value=2, 
+             max_value=8,
+             key = "num_countries")
+    with col2:
+        st.radio(
+                "Select the type of graph:",
+                options=['Pie Chart', 'Bar Graph'],
+                index=['Pie Chart', 'Bar Graph'].index(st.session_state.graph_type_countries),
+                horizontal= True,
+                key='graph_type_countries'
+            )
+    with col3:
+        if st.session_state.graph_type_countries == 'Bar Graph':
+            st.checkbox(
+                    'Make the graphs realtive to population.',
+                    key= 'rel2pop_countries'
+                )
+    
+    col1, col2 =st.columns(2)
+    with col1:
+        title = "COVID-19 Cases by Country"
+        if st.session_state.graph_type_countries == 'Pie Chart':
+            values = 'Total Cases'
+            fig = px.pie(filtered_df.sort_values(by=values, ascending = False).iloc[:st.session_state.num_countries],
+                        names = "Country",
+                        values= values,
+                        title= title,
+                        )
+        else:
+            values = 'Total Cases' if not st.session_state.rel2pop_countries else 'Total Cases Per Million'
+            fig = px.bar(filtered_df.sort_values(by=values, ascending = False).iloc[:st.session_state.num_countries], 
+                        x='Country', 
+                        y=values, 
+                        title=title,
+                    )
+        st.plotly_chart(fig)
+    with col2:
+        title = "COVID-19 Deaths by Country"
+        if st.session_state.graph_type_countries == 'Pie Chart':
+            values = "Total Deaths"
+            fig = px.pie(filtered_df.sort_values(by=values, ascending = False).iloc[:st.session_state.num_countries],
+                        names = "Country",
+                        values= values,
+                        title= title,
+                        )
+        else:
+            values = 'Total Deaths' if not st.session_state.rel2pop_countries else 'Total Deaths Per Million'
+            fig = px.bar(filtered_df.sort_values(by=values, ascending = False).iloc[:st.session_state.num_countries], 
+                        x='Country', 
+                        y=values, 
+                        title=title,
+                    )
+        st.plotly_chart(fig)
+
 def overview(spread_df):
-    st.subheader('Overview')
+    # st.subheader('Overview')
     total_cases = 773956770 
     total_deaths = 7016159
     case_fatality_rate = (total_deaths/total_cases)*100
@@ -37,6 +171,11 @@ def overview(spread_df):
     col1.metric(label="Total COVID-19 Cases", value=f"{total_cases:,}")
     col2.metric(label="Total COVID-19 Deaths", value=f"{total_deaths:,}")
     col3.metric(label="Case Fatality Rate", value= f"{case_fatality_rate:.6f}%")
+    
+    final_values_df = spread_df.groupby('Country').tail(1).reset_index(drop=True)
+    continets_charts(final_values_df)
+    top_n_countries(final_values_df)
+    
 
 
 ############ Choropleth Animation #############################
@@ -72,7 +211,7 @@ def choropleth_animation(choropleth_df):
                 color_continuous_scale='Greens',
                 animation_frame='Date',
                 title=f'{parameter} Over Time For {scope.title()}',
-                range_color=[0,10e5],
+                range_color=[0,choropleth_df[parameter].quantile(0.75)],
                 scope=scope,
     )
     fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 300
