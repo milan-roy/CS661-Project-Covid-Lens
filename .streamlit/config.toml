@@ -5,3 +5,6 @@ backgroundColor="#000000"  # Pure black background
 secondaryBackgroundColor="#1e1e1e"  # Dark gray cards/sidebar
 textColor="#ffffff"  # White text
 font="sans serif"  # Optional: "serif", "monospace"
+
+[server]
+runOnSave = false
