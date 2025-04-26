@@ -6,17 +6,11 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.signal import savgol_filter
 
-# # ---------- Load Cleaned Data ----------
-@st.cache_data
-def load_data():
-    data_path = os.path.join("Datasets", "Mobility Analysis", "cleaned_data.parquet")
-    df = pd.read_parquet(data_path)
-    df["month"] = df["date"].dt.to_period("M").astype(str)
-    df["year"] = df["date"].dt.year
-    return df
-
-# Then replace everywhere:
-merged_df = load_data()
+# ---------- Load Cleaned Data ----------
+data_path = os.path.join("Datasets", "Mobility Analysis", "cleaned_data.parquet")
+merged_df = pd.read_parquet(data_path)
+merged_df["month"] = merged_df["date"].dt.to_period("M").astype(str)
+merged_df["year"] = merged_df["date"].dt.year
 
 # ---------- Sidebar ----------
 st.sidebar.title("Filters")
