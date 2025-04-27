@@ -13,9 +13,9 @@ CovidLens is a standalone web-based visualization platform, built using Python a
 1. **Krishna Kumar Bais**<br>
    Analysis of Vaccination Data
 1. **Sevak Shekokar**<br>
-   Google Mobility Analysis
+   Testing Impact Analysis
 1. **Rohan**<br>
-   Top-k Songs
+   Google Mobility Analysis
 1. **Sanjay Singh Shekhawat**<br>
    Analyzing COVID-19 Impacts in India
 1. **Tsewang Chukey**<br>
@@ -29,12 +29,12 @@ CovidLens is a standalone web-based visualization platform, built using Python a
 # Usage
 
 **Development Environment:**<br>
-Execute the given `setup.bat` or run the command `pip install -r requirements.txt`
+ - Clone the GitHub repo.
+ - Install and activate a virtual environment, if required.
+ - Run the command `pip install -r requirements.txt`
 
 **Run via Localhost:**<br>
-Execute the given `run.bat` or run the command `streamlit run Home.py`
+ - Run the command `streamlit run Home.py`
 
-**Deployed Application:**<br>
-https://cs661-big-data-visual-analytics-group1.streamlit.app/
 
 <br>
