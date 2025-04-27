@@ -147,9 +147,9 @@ with tab1:
         yaxis_title="Number of Cases",
         template="plotly",  # Light mode template
         bargap=0.05,
-        plot_bgcolor="white",  # Set background color to white
-        paper_bgcolor="white",  # Set paper color to white
-        font=dict(color="black"),  # Set font color to black for visibility
+        # plot_bgcolor="white",  # Set background color to white
+        # paper_bgcolor="white",  # Set paper color to white
+        # font=dict(color="black"),  # Set font color to black for visibility
         showlegend=True,
         legend=dict(
             title="Case Type",

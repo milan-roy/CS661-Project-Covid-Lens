@@ -33,7 +33,7 @@ exclude_keywords = [
 ]
 
 # Sidebar filter for date
-st.sidebar.header("🔧 Filters")
+st.sidebar.header("Filters")
 vax_dates = sorted(df["date"].dt.date.unique())
 selected_date = st.sidebar.date_input(
     "📅 Select a Date",
@@ -58,10 +58,10 @@ monthly_avg["month_str"] = monthly_avg["month"].dt.strftime("%Y-%m")
 st.title("Daily Vaccination & Recovery Dashboard")
 
 # ------------------------
-# 💉 Vaccination & ICU Charts
+#  Vaccination & ICU Charts
 # ------------------------
 if not df_top10.empty:
-    st.subheader("💉 Vaccination & ICU Snapshot (Top Countries)")
+    st.subheader("Vaccination & ICU Snapshot (Top Countries)")
     
     vax_metrics = [
     ("daily_vaccinations", f"💉 Total Doses Given on {selected_date}", "Blues"),
@@ -111,7 +111,7 @@ if not df_top10.empty:
             st.info("⚠ No ICU occupancy data available for the selected date.")
             
             
-# 📊 Grouped Bar Chart – Active vs Estimated Recovered (Clarified)
+#  Grouped Bar Chart – Active vs Estimated Recovered (Clarified)
 # -------------------------
 st.subheader("📊 Active vs Recovered Cases by Country (Selected Date)")
 
@@ -121,7 +121,7 @@ bar_mode = st.radio("Select Data Mode", ["Top 10 Active Cases", "Custom Country 
 
 if bar_mode == "Custom Country Selection":
     custom_countries = st.multiselect(
-        "🌍 Select Countries to Compare",
+       
         options=sorted(recovery_snapshot["country"].unique()),
         default=["India", "United States", "Brazil"]
     )
@@ -166,7 +166,7 @@ else:
     st.info("ℹ No data available for the selected countries and date.")
 
 # -------------------------
-# 🌍 Monthly Choropleth Map
+#Monthly Choropleth Map
 # -------------------------
 st.subheader("🌍 Monthly Animated Choropleth Map: Estimated Recovery Rate")
 
@@ -180,15 +180,17 @@ fig_map = px.choropleth(
     hover_name="country",
     color_continuous_scale="Greens",
     range_color=[0, 100],
-    title="🗺 Monthly Recovery Rate by Country"
+    title="🗺 Monthly Recovery Rate by Country",
+    labels={"month_str": "Date "}  # <--- This changes the slider label
 )
+
 fig_map.update_geos(showcoastlines=True, showframe=False, projection_type="natural earth")
 fig_map.update_layout(margin=dict(l=40, r=40, t=60, b=20))
 st.plotly_chart(fig_map, use_container_width=True)
 
 
 # -------------------------
-# 📈 Line Chart: Recovery Rate Over Time (with working slider preview)
+# Line Chart: Recovery Rate Over Time (with working slider preview)
 # -------------------------
 st.subheader("📈 Estimated Recovery Rate Over Time")
 
@@ -197,11 +199,13 @@ non_agg = recovery_df[~recovery_df["country"].str.contains('|'.join(exclude_keyw
 top3_countries = non_agg.groupby("country")["total_cases"].max().nlargest(3).index.tolist()
 
 # Multiselect UI
+# Multiselect UI with label for the "Estimated Recovery Rate Over Time" chart
 selected_countries = st.multiselect(
-    "🌍 Select Countries for Recovery Trend",
+    label="Select Countries to Visualize Recovery Rate",  # Added label argument
     options=sorted(recovery_df["country"].unique()),
     default=top3_countries
 )
+
 
 # Filter for selected countries and valid dates
 line_df = recovery_df[
@@ -236,7 +240,7 @@ if not line_df.empty:
                     dict(step="all")
                 ]
             ),
-            rangeslider=dict(visible=True),  # ✅ Enables preview in slider
+            rangeslider=dict(visible=True),  #Enables preview in slider
             type="date"
         ),
         yaxis=dict(title="Recovery Rate", tickformat=".0%", range=[0, 1]),

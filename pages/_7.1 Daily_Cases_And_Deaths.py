@@ -8,7 +8,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Set page configuration
-st.set_page_config(page_title="Daily Analysis for Cases and Deaths", layout="wide")
+st.set_page_config(page_title="Daily Vaccination & Recovery Dashboard", layout="wide")
 
 # Constants
 DATA_FILE_PATH = os.path.join("Datasets","Daily Analysis","daily_analysis_data.csv")
@@ -27,10 +27,7 @@ def load_cleaned_temporal_data():
 
 temporal_df = load_cleaned_temporal_data()
 
-# -------------------------
-# Title and Peak Stats
-# -------------------------
-st.title("Daily Analysis for Cases and Deaths")
+
 
 # Peak values with dates
 peak_cases = temporal_df.loc[temporal_df.groupby("country")["new_cases"].idxmax()]
@@ -73,11 +70,11 @@ with col2:
     )
     st.plotly_chart(fig_peak_deaths, use_container_width=True)
 
-# -------------------------
+
 # Sidebar Filters
 # -------------------------
 with st.sidebar:
-    st.header("🔧 Filters")
+    st.header("Filters")
 
     # Filter valid dates
     valid_day_data = temporal_df.dropna(subset=["new_cases", "new_deaths"])
@@ -114,7 +111,7 @@ with st.sidebar:
             default=default_top10_countries
         )
 
-# -------------------------
+
 # Bubble Chart
 # -------------------------
 st.subheader("🫧 New Cases vs New Deaths")
@@ -155,7 +152,7 @@ else:
     )
     st.plotly_chart(fig_bubble, use_container_width=True)
 
-# -------------------------
+
 # Bar Race Animation
 # -------------------------
 st.subheader("🎬Animation – New Cases & Deaths")
@@ -178,56 +175,99 @@ top10_deaths_frames = (
 dates = top10_cases_frames["date"].sort_values().unique()
 
 def build_adaptive_bar_race(df, value_col, title, color_scale):
-    def choose_axis_limit(value, is_death=False):
-        if is_death:
-            buckets = [500010000, 50000]
-        else:
-            buckets = [50000, 100000, 250000, 500000, 1000000, 2000000]
-        for b in buckets:
-            if value <= b:
-                return b
-        return int(value * 1.1)
+    # Define bucket thresholds
+    if value_col == "new_deaths":
+        buckets = [10000, 50000, 100000, 250000]
+    else:
+        buckets = [10000,50000, 100000,150000,200000, 250000,300000,350000,400000,450000, 500000, 1000000, 2000000]
 
-    is_death = (value_col == "new_deaths")
+    # Start with the smallest bucket
+    current_bucket_idx = 0
+    current_bucket = buckets[current_bucket_idx]
+
     frames = []
-
     for date in dates:
         daily_data = df[df["date"] == date]
-        x_max = choose_axis_limit(daily_data[value_col].max(), is_death=is_death)
+        max_val = daily_data[value_col].max()
 
-        frame = go.Frame(
-            data=[go.Bar(
+        # Increase bucket only if the max_val crosses the current bucket
+        if max_val > current_bucket and current_bucket_idx < len(buckets) - 1:
+            while current_bucket_idx < len(buckets) - 1 and max_val > buckets[current_bucket_idx]:
+                current_bucket_idx += 1
+            current_bucket = buckets[current_bucket_idx]
+
+        date_str = pd.to_datetime(str(date)).strftime('%Y-%m-%d')
+        frames.append(
+            go.Frame(
+                data=[go.Bar(
                 x=daily_data[value_col],
                 y=daily_data["country"],
                 orientation='h',
                 marker=dict(color=daily_data[value_col], colorscale=color_scale),
                 hovertemplate='%{y}: %{x:,.0f}<extra></extra>',
+                text=daily_data["country"],                 # <-- Only country name outside bar
+                textposition="outside",
             )],
-            name=str(pd.to_datetime(date).date()),
-            layout=go.Layout(xaxis=dict(range=[0, x_max]))
-        )
-        frames.append(frame)
 
-    init_data = df[df["date"] == dates[0]]
+                name=date_str,
+                layout=go.Layout(
+                    xaxis=dict(range=[0, current_bucket])
+                )
+            )
+        )
+
+    # Initial frame uses the smallest bucket
+    first_date = dates[0]
+    init_data = df[df["date"] == first_date]
+    first_date_str = pd.to_datetime(str(first_date)).strftime('%Y-%m-%d')
+
     fig = go.Figure(
         data=[go.Bar(
-            x=init_data[value_col],
-            y=init_data["country"],
-            orientation='h',
-            marker=dict(color=init_data[value_col], colorscale=color_scale),
-            hovertemplate='%{y}: %{x:,.0f}<extra></extra>',
-        )],
+        x=init_data[value_col],
+        y=init_data["country"],
+        orientation='h',
+        marker=dict(color=init_data[value_col], colorscale=color_scale),
+        hovertemplate='%{y}: %{x:,.0f}<extra></extra>',
+        width=0.7,
+        text=init_data["country"],                 # <-- Only country name outside bar
+        textposition="outside",
+    )],
+
         layout=go.Layout(
             title=title,
-            xaxis=dict(title=value_col.replace("_", " ").title(), tickformat="~s"),
-            yaxis=dict(title="Country", autorange="reversed"),
-            margin=dict(l=100, r=20, t=60, b=80),
+            xaxis=dict(
+            title=value_col.replace("_", " ").title(),
+            tickformat="~s",
+            range=[0, buckets[0]],
+            fixedrange=True,
+            showline=False,
+            linewidth=2,
+            linecolor='white',
+            mirror=True
+        ),
+
+          yaxis=dict(
+          title="",
+          autorange="reversed",
+          fixedrange=True,
+          showticklabels=False,
+          automargin=True,
+          showline=False,
+          linewidth=2,
+          linecolor='white',
+          mirror=True
+        ),
+
+            margin=dict(l=120, r=20, t=60, b=80),
+            height=550,
+            width=800,
             sliders=[dict(
                 steps=[
-                    dict(method="animate",
-                         args=[[str(pd.to_datetime(date).date())],
-                               {"mode": "immediate"}],
-                         label=str(pd.to_datetime(date).date()))
+                    dict(
+                        method="animate",
+                        args=[[pd.to_datetime(str(date)).strftime('%Y-%m-%d')], {"mode": "immediate"}],
+                        label=pd.to_datetime(str(date)).strftime('%Y-%m-%d')
+                    )
                     for date in dates
                 ],
                 transition={"duration": 0},
@@ -240,8 +280,9 @@ def build_adaptive_bar_race(df, value_col, title, color_scale):
                 type="buttons",
                 direction="right",
                 showactive=False,
+                pad={"r": 10, "t": 10},
                 x=0.5,
-                y=-0.6,
+                y=1.25,
                 xanchor="center",
                 yanchor="top",
                 buttons=[
@@ -249,9 +290,9 @@ def build_adaptive_bar_race(df, value_col, title, color_scale):
                         label="▶ Play",
                         method="animate",
                         args=[None, {
-                            "frame": {"duration": 500, "redraw": True},
+                            "frame": {"duration": 300, "redraw": False},
                             "fromcurrent": True,
-                            "transition": {"duration": 300}
+                            "transition": {"duration": 150}
                         }]
                     ),
                     dict(
@@ -270,6 +311,8 @@ def build_adaptive_bar_race(df, value_col, title, color_scale):
     )
     return fig
 
+
+
 fig_cases = build_adaptive_bar_race(
     top10_cases_frames, "new_cases", "Top 10 Countries by New Cases Over Time", "Blues"
 )
@@ -279,3 +322,4 @@ fig_deaths = build_adaptive_bar_race(
 
 st.plotly_chart(fig_cases, use_container_width=True)
 st.plotly_chart(fig_deaths, use_container_width=True)
+
