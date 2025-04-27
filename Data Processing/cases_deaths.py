@@ -41,10 +41,10 @@ cases_deaths_df['country'] = cases_deaths_df['country'].replace('World excl. Chi
 
 cases_deaths_df['date'] = pd.to_datetime(cases_deaths_df['date'])
 cases_deaths_df = cases_deaths_df[cases_deaths_df['date'] <= pd.to_datetime('2024-01-01')]
-cases_deaths_df['new_cases'] = cases_deaths_df['new_cases'].fillna(0)
-cases_deaths_df['new_deaths'] = cases_deaths_df['new_deaths'].fillna(0)
-cases_deaths_df['new_cases_per_million'] = cases_deaths_df['new_cases_per_million'].fillna(0)
-cases_deaths_df['new_deaths_per_million'] = cases_deaths_df['new_deaths_per_million'].fillna(0)
+cases_deaths_df['new_cases'] = cases_deaths_df['new_cases'].ffill()
+cases_deaths_df['new_deaths'] = cases_deaths_df['new_deaths'].ffill()
+cases_deaths_df['new_cases_per_million'] = cases_deaths_df['new_cases_per_million'].ffill()
+cases_deaths_df['new_deaths_per_million'] = cases_deaths_df['new_deaths_per_million'].ffill()
 
 cases_deaths_df['total_cases'] = cases_deaths_df['total_cases'].ffill()
 cases_deaths_df['total_deaths'] = cases_deaths_df['total_deaths'].ffill()
