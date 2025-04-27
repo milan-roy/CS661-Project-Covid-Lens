@@ -60,13 +60,6 @@ def continents_charts(cases_df, deaths_df):
                         values= "Total Cases",
                         title= title,
                         )
-            # cases_df['World'] = 'World'
-            # fig = px.sunburst(cases_df,
-            #         path=['World','Continent', 'Country'],  
-            #         values='Total Cases',
-            #         maxdepth=2,
-            #         title=title
-            #     )
         else:
             fig = px.bar(cases_df, 
                         x='Country', 
@@ -192,13 +185,7 @@ def overview(cases_df, deaths_df):
 def choropleth_animation(cases_df, deaths_df):
     
     st.subheader("Choropleth Animation of Global and Regional Spread of the Disease Over Time")
-    st.write('''This interactive choropleth animation visualizes the spread of the disease over time.
-              Use the selectbox to adjust the scope of the map, focusing on a specific continent or the entire
-              world. You can also switch between different parameters, such as Total Cases and Total Cases
-              Per Million, to gain deeper insights into the impact of the disease across different regions.
-              The animation helps track trends over time, highlighting how different areas have been affected.
-              ''')
-    
+     
     col1, col2, col3 = st.columns(3)
     with col1:
         st.selectbox(
@@ -215,14 +202,6 @@ def choropleth_animation(cases_df, deaths_df):
             index = 0,
             key = 'map_metric',
         )
-
-    # with col3:
-    #     st.selectbox(
-    #         "Choose the Interval",
-    #         ['Daily','Weekly','Biweekly','Cummulative'],
-    #         index = 0,
-    #         key='map_interval'
-    #     )
     with col3:
         st.checkbox(
             'Make the graphs relative to population',
@@ -231,15 +210,6 @@ def choropleth_animation(cases_df, deaths_df):
         )
 
     parameter = st.session_state.map_metric
-    # if st.session_state.map_interval == 'Daily':
-    #     parameter = 'New ' + parameter
-    # elif st.session_state.map_interval == 'Weekly':
-    #     parameter = 'Weekly ' + parameter
-    # elif st.session_state.map_interval == 'Biweekly':
-    #     parameter = 'Biweekly ' + parameter
-    # else:
-    #     parameter = 'Total ' + parameter
-
     if st.session_state.map_rel2pop:
         parameter = parameter + " Per Million"
 
@@ -273,7 +243,7 @@ def choropleth_animation(cases_df, deaths_df):
 @st.fragment
 def time_series_continents(cases_df, deaths_df):
 
-    st.subheader("Continent Wise Analysis")
+    st.subheader("Timeseries Analysis-Continent Wise")
     st.multiselect(
             "Select the continents",
             ['World','Asia','Europe','North America', 'South America', 'Africa', 'Oceania'],
@@ -338,7 +308,7 @@ def time_series_continents(cases_df, deaths_df):
 
 @st.fragment
 def time_series_countries(cases_df, deaths_df):
-    st.subheader("Country Wise Analysis")
+    st.subheader("Timeseries Analysis-Country Wise")
     continents = ['Asia','Europe','North America', 'South America', 'Africa', 'Oceania']
     countries = [country for country in cases_df['Country'].unique() if country not in continents]
 
@@ -405,14 +375,6 @@ def time_series_countries(cases_df, deaths_df):
     st.plotly_chart(fig)
 
 def plot_graph(cases_df, deaths_df):
-    st.subheader("Time-Series Visualization of Disease Spread")
-    st.write('''This interactive line graph visualizes the spread of the disease over time.
-                You can select different parameters such as new/total cases and deaths, both in absolute numbers
-                and per million population. Additionally, the multiselect box allows you to compare multiple
-                countries simultaneously, helping to analyze trends across different regions.''')
-    
-    # continents = ['Asia','Europe','North America', 'South America', 'Africa', 'Oceania']
-    # continents_cases_df = cases_df[cases_df['Country'].isin()]
     time_series_continents(cases_df,deaths_df)
     time_series_countries(cases_df,deaths_df)
     
@@ -427,7 +389,7 @@ def plot_graph(cases_df, deaths_df):
     deaths_0_1_per_million_df = deaths_df[deaths_df['Days Since 0 1 Total Deaths Per Million']==0]
     deaths_0_1_per_million_df = deaths_0_1_per_million_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country','Continent']]
 
-    st.subheader("Timeline of Countries Reaching 100 Cases ")
+    st.subheader("Timeline of Countries Reaching 100 Cases Threshold")
     fig = px.strip(cases_100_df,
                    x="Date",
                    y="Country",
@@ -435,7 +397,7 @@ def plot_graph(cases_df, deaths_df):
                    )
     st.plotly_chart(fig)
 
-    st.subheader("Timeline of Countries Reaching 1 Case Per Million Population")
+    st.subheader("Timeline of Countries Reaching 1 Case Per Million Population Threshold")
     fig = px.strip(cases_1_per_million_df,
                 x="Date",
                 y="Country",
@@ -443,7 +405,7 @@ def plot_graph(cases_df, deaths_df):
                 )
     st.plotly_chart(fig)
 
-    st.subheader("Timeline of Countries Reaching 5 Deaths")
+    st.subheader("Timeline of Countries Reaching 5 Deaths Threshold")
     fig = px.strip(deaths_5_df,
                 x="Date",
                 y="Country",
@@ -451,7 +413,7 @@ def plot_graph(cases_df, deaths_df):
                 )
     st.plotly_chart(fig)
 
-    st.subheader("Timeline of Countries Reaching 0.1 Deaths Per Million Population")
+    st.subheader("Timeline of Countries Reaching 0.1 Deaths Per Million Population Threshold")
     fig = px.strip(deaths_0_1_per_million_df,
                 x="Date",
                 y="Country",
@@ -482,7 +444,7 @@ if'choropleth_deaths_df' not in st.session_state:
     deaths_df_temp = deaths_df_temp[['Date','Country','Total Deaths','Total Deaths Per Million','Isocode','Continent']]
     st.session_state.choropleth_deaths_df = load_choropleth_df(deaths_df_temp)
 
-tabs = st.tabs(['Overview', 'Map','Timeseries'])
+tabs = st.tabs(['Overview', 'Map Visualization','Timeline Plots'])
 
 with tabs[0]:
     overview(st.session_state.cases_df, st.session_state.deaths_df)

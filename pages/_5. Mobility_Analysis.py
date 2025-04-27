@@ -12,6 +12,8 @@ merged_df = pd.read_parquet(data_path)
 merged_df["month"] = merged_df["date"].dt.to_period("M").astype(str)
 merged_df["year"] = merged_df["date"].dt.year
 
+
+st.title("Mobility Analysis")
 # ---------- Sidebar ----------
 st.sidebar.title("Filters")
 min_date = merged_df["date"].min()
