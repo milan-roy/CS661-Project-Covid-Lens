@@ -245,28 +245,7 @@ with tab2:
         'rolling_vaccinations_12m': '12-Month Rolling Vaccinations'
     })
 
-    # Rolling Vaccination Trends (Line chart)           
-    st.subheader(f"2. Rolling Vaccination Trends in {selected_country}")
-
-    fig9 = px.line(
-        renamed_df,
-        x='date',
-        y=[
-            '6-Month Rolling Vaccinations',
-            '9-Month Rolling Vaccinations',
-            '12-Month Rolling Vaccinations'
-        ],
-        labels={'value': 'Number of People', 'variable': 'Time Window', 'date': 'Date'},
-        color_discrete_map={
-            '6-Month Rolling Vaccinations': '#1f77b4',
-            '9-Month Rolling Vaccinations': '#ff7f0e',
-            '12-Month Rolling Vaccinations': '#2f7f0e'
-        }
-    )
-
-    st.plotly_chart(fig9, use_container_width=True)
-
-    st.subheader(f"3. Vaccination Rates Analysis in {selected_country}")
+    st.subheader(f"2. Vaccination Rates Analysis in {selected_country}")
 
     # Define friendly label mappings for better readability
     x_axis_labels = {
