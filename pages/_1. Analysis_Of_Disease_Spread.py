@@ -276,8 +276,8 @@ def time_series_continents(cases_df, deaths_df):
     st.subheader("Continent Wise Analysis")
     st.multiselect(
             "Select the continents",
-            ['Asia','Europe','North America', 'South America', 'Africa', 'Oceania'],
-            default=['Asia','Europe'],
+            ['World','Asia','Europe','North America', 'South America', 'Africa', 'Oceania'],
+            default=['World','Asia','Europe'],
             key = 'time_series_continents',
         )
     col1, col2, col3, col4 = st.columns(4)
@@ -419,39 +419,43 @@ def plot_graph(cases_df, deaths_df):
 
 
     cases_100_df = cases_df[cases_df['Days Since 100 Total Cases']==0]
-    cases_100_df = cases_100_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country']]
+    cases_100_df = cases_100_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country','Continent']]
     cases_1_per_million_df = cases_df[cases_df['Days Since 1 Total Cases Per Million']==0]
-    cases_1_per_million_df = cases_1_per_million_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country']]
+    cases_1_per_million_df = cases_1_per_million_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country','Continent']]
     deaths_5_df = deaths_df[deaths_df['Days Since 5 Total Deaths']==0]
-    deaths_5_df = deaths_5_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country']]
+    deaths_5_df = deaths_5_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country','Continent']]
     deaths_0_1_per_million_df = deaths_df[deaths_df['Days Since 0 1 Total Deaths Per Million']==0]
-    deaths_0_1_per_million_df = deaths_0_1_per_million_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country']]
+    deaths_0_1_per_million_df = deaths_0_1_per_million_df.dropna(subset=['Isocode']).reset_index(drop=True)[['Date','Country','Continent']]
 
     st.subheader("Timeline of Countries Reaching 100 Cases ")
     fig = px.strip(cases_100_df,
                    x="Date",
-                   y="Country"
+                   y="Country",
+                   color='Continent'
                    )
     st.plotly_chart(fig)
 
     st.subheader("Timeline of Countries Reaching 1 Case Per Million Population")
     fig = px.strip(cases_1_per_million_df,
                 x="Date",
-                y="Country"
+                y="Country",
+                color='Continent'
                 )
     st.plotly_chart(fig)
 
     st.subheader("Timeline of Countries Reaching 5 Deaths")
     fig = px.strip(deaths_5_df,
                 x="Date",
-                y="Country"
+                y="Country",
+                color='Continent'
                 )
     st.plotly_chart(fig)
 
     st.subheader("Timeline of Countries Reaching 0.1 Deaths Per Million Population")
     fig = px.strip(deaths_0_1_per_million_df,
                 x="Date",
-                y="Country"
+                y="Country",
+                color='Continent'
                 )
     st.plotly_chart(fig)
 

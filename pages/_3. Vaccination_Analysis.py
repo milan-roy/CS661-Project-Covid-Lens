@@ -125,7 +125,7 @@ with tab1:
                         color="total_cases",
                         hover_name="country",
                         color_continuous_scale=px.colors.sequential.Plasma,
-                        range_color=(0, 110e6))
+                        range_color=(0, 104e6))
     fig2.update_layout(**map_layout)
     fig2.update_layout(coloraxis_colorbar=dict(
         title="Cases",
@@ -161,12 +161,12 @@ with tab1:
                         color="total_deaths",
                         hover_name="country",
                         color_continuous_scale=px.colors.sequential.Plasma,
-                        range_color=(0, 1.6e6))
+                        range_color=(0, 1.2e6))
     fig3.update_layout(**map_layout)
     fig3.update_layout(coloraxis_colorbar=dict(
         title="Deaths",
-        tickvals=[0, 4e5, 8e5, 1.2e6, 1.6e6],
-        ticktext=["0L", "4L", "8L", "12L", "16L"]
+        tickvals=[0, 3e5, 6e5, 9e5, 1.2e6],
+        ticktext=["0L", "3L", "6L", "9L", "12L"]
     ))
     st.plotly_chart(fig3, use_container_width=True)
 
@@ -337,7 +337,7 @@ with tab3:
                               title='People Vaccinated (At Least 1 Dose)')
             st.plotly_chart(fig_people, use_container_width=True)
 
-        st.subheader("2. Vaccination Rate Trends")
+        st.subheader("2. Daily Vaccination Rate Trends")
         trend_options = {
             'daily_vaccinations_smoothed': 'Daily Vaccinations',
             'daily_people_vaccinated_smoothed': 'People Receiving 1st Dose',
@@ -421,7 +421,7 @@ with tab4:
             st.plotly_chart(fig, use_container_width=True)
 
         # Manufacturer-Specific Analysis (Line chart)
-        st.subheader(f"3. Manufacturer-Specific Analysis")
+        st.subheader(f"3. Manufacturer-Specific Analysis over Time in {selected_country}")
         
         # Get unique manufacturers for the selected country
         manufacturers = country_data['vaccine'].unique().tolist()
