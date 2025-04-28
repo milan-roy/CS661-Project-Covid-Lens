@@ -381,4 +381,4 @@ with tab4:
 
 # ------------------- Footer -------------------
 st.markdown("---")
-st.markdown("<center style='color: grey;'>Task 8: Analyzing COVID-19 impact in India</center>", unsafe_allow_html=True)
+st.markdown("<center style='color: grey;'>Task 6: Analyzing COVID-19 impact in India</center>", unsafe_allow_html=True)
