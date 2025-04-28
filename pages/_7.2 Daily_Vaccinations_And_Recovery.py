@@ -121,7 +121,7 @@ bar_mode = st.radio("Select Data Mode", ["Top 10 Active Cases", "Custom Country 
 
 if bar_mode == "Custom Country Selection":
     custom_countries = st.multiselect(
-       
+       "Select countries for custom selection",
         options=sorted(recovery_snapshot["country"].unique()),
         default=["India", "United States", "Brazil"]
     )
